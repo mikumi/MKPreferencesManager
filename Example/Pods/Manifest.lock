@@ -1,0 +1,19 @@
+PODS:
+  - MKLog (0.1.2)
+  - MKPreferencesManager (0.1.0):
+    - MKLog (~> 0.1.2)
+
+DEPENDENCIES:
+  - MKPreferencesManager (from `../`)
+
+EXTERNAL SOURCES:
+  MKPreferencesManager:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  MKLog: 9e714e441dfe2765534e8b3a6a45dc8442aa56c3
+  MKPreferencesManager: 2f593160f27553dc3ed97e7e1f6094456dfb37de
+
+PODFILE CHECKSUM: 3360736d96ed3f48a5f194da884729a8872113a8
+
+COCOAPODS: 1.0.1

@@ -1,0 +1,6 @@
+framework module MKLog {
+  umbrella header "MKLog-umbrella.h"
+
+  export *
+  module * { export * }
+}
