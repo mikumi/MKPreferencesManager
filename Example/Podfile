@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'MKPreferencesManager_Example' do
+  pod 'MKPreferencesManager', :path => '../'
+
+  target 'MKPreferencesManager_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
