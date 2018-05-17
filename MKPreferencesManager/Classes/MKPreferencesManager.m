@@ -64,6 +64,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
         _localStore           = localStore;
         _iCloudStore          = iCloudStore;
         _ignoreListForSyncing = [[NSMutableArray alloc] initWithArray:iCloudIgnoreList];
+        _iCloudSyncEnabled = YES;
 
         [self synchronize];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iCloudUpdate:)
@@ -108,7 +109,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     [self.localStore setBool:value forKey:key];
-    if (![self.ignoreListForSyncing containsObject:key]) {
+    if ([self iCloudEnabledForKey:key]) {
         [self.iCloudStore setBool:value forKey:key];
     }
 }
@@ -117,7 +118,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     [self.localStore setDouble:value forKey:key];
-    if (![self.ignoreListForSyncing containsObject:key]) {
+    if ([self iCloudEnabledForKey:key]) {
         [self.iCloudStore setDouble:value forKey:key];
     }
 }
@@ -126,7 +127,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     [self.localStore setInteger:value forKey:key];
-    if (![self.ignoreListForSyncing containsObject:key]) {
+    if ([self iCloudEnabledForKey:key]) {
         [self.iCloudStore setLongLong:value forKey:key];
     }
 }
@@ -135,7 +136,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     [self.localStore setObject:object forKey:key];
-    if (![self.ignoreListForSyncing containsObject:key]) {
+    if ([self iCloudEnabledForKey:key]) {
         [self.iCloudStore setObject:object forKey:key];
     }
 }
@@ -144,7 +145,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     BOOL value = NO;
-    if ((![self.ignoreListForSyncing containsObject:key]) &&
+    if ([self iCloudEnabledForKey:key] &&
         [self.iCloudStore.dictionaryRepresentation.allKeys containsObject:key]) {
         value = [self.iCloudStore boolForKey:key];
         [self.localStore setBool:value forKey:key];
@@ -158,7 +159,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     double value = 0.0f;
-    if ((![self.ignoreListForSyncing containsObject:key]) &&
+    if ([self iCloudEnabledForKey:key] &&
         [self.iCloudStore.dictionaryRepresentation.allKeys containsObject:key]) {
         value = [self.iCloudStore doubleForKey:key];
         [self.localStore setDouble:value forKey:key];
@@ -172,7 +173,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     NSInteger value = 0;
-    if ((![self.ignoreListForSyncing containsObject:key]) &&
+    if ([self iCloudEnabledForKey:key] &&
         [self.iCloudStore.dictionaryRepresentation.allKeys containsObject:key]) {
         value = (NSInteger)[self.iCloudStore longLongForKey:key];
         [self.localStore setInteger:value forKey:key];
@@ -186,7 +187,7 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     id value = nil;
-    if ((![self.ignoreListForSyncing containsObject:key]) &&
+    if ([self iCloudEnabledForKey:key] &&
         [self.iCloudStore.dictionaryRepresentation.allKeys containsObject:key]) {
         value = [self.iCloudStore objectForKey:key];
         [self.localStore setObject:value forKey:key];
@@ -200,7 +201,9 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 {
     NSAssert(key, @"key cannot be nil");
     [self.localStore removeObjectForKey:key];
-    [self.iCloudStore removeObjectForKey:key];
+    if ([self iCloudEnabledForKey:key]) {
+        [self.iCloudStore removeObjectForKey:key];
+    }
 }
 
 /**
@@ -218,6 +221,15 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
             }];
 
     [self synchronize];
+}
+
+- (void)resetICloudStore
+{
+    [[self.iCloudStore dictionaryRepresentation]
+            enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [self.iCloudStore removeObjectForKey:key];
+            }];
+    [self.iCloudStore synchronize];
 }
 
 - (void)addSyncIgnoreKey:(NSString *)key
@@ -271,6 +283,11 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
                     postNotificationName:MKPreferencesManagerKeysDidChangeNotification object:self userInfo:userInfo];
         }
     }
+}
+
+- (BOOL)iCloudEnabledForKey:(NSString *)key
+{
+    return (self.iCloudSyncEnabled && ![self.ignoreListForSyncing containsObject:key]);
 }
 
 @end

@@ -20,6 +20,8 @@ extern NSString *const MKPreferencesManagerChangedKeys;
 */
 @interface MKPreferencesManager : NSObject
 
+@property (nonatomic) BOOL iCloudSyncEnabled;
+
 - (instancetype)initWithUserDefaults:(NSUserDefaults *)localStore
              ubiquitousKeyValueStore:(NSUbiquitousKeyValueStore *)iCloudStore;
 - (instancetype)initWithUserDefaults:(NSUserDefaults *)localStore
@@ -40,6 +42,7 @@ extern NSString *const MKPreferencesManagerChangedKeys;
 - (void)removeObjectForKey:(NSString *)key;
 
 - (void)resetPreferences;
+- (void)resetICloudStore;
 
 - (void)synchronize;
 
