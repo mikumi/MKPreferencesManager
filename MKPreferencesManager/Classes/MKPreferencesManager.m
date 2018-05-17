@@ -20,9 +20,6 @@ NSString *const MKPreferencesManagerChangedKeys               = @"MKPreferencesM
 
 @property (strong, atomic, readonly) NSMutableArray *ignoreListForSyncing;
 
-@property (strong, nonatomic, readonly) NSUserDefaults            *localStore;
-@property (strong, nonatomic, readonly) NSUbiquitousKeyValueStore *iCloudStore;
-
 - (void)iCloudUpdate:(NSNotification *)notification;
 
 @end

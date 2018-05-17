@@ -20,6 +20,9 @@ extern NSString *const MKPreferencesManagerChangedKeys;
 */
 @interface MKPreferencesManager : NSObject
 
+@property (strong, nonatomic, readonly) NSUserDefaults            *localStore;
+@property (strong, nonatomic, readonly) NSUbiquitousKeyValueStore *iCloudStore;
+
 @property (nonatomic) BOOL iCloudSyncEnabled;
 
 - (instancetype)initWithUserDefaults:(NSUserDefaults *)localStore
